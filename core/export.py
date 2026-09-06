@@ -141,8 +141,20 @@ def _has_audio(path):
         try:
             _AUDIO_SEEN[path] = bool(media.probe(path).has_audio)
         except Exception:
-            _AUDIO_SEEN[path] = False
-    return _AUDIO_SEEN[path]
+            _AUDIO_SEEN[path] = None
+    return _AUDIO_SEEN[path] is True
+
+
+def _audio_known_absent(path):
+    """
+    هل تأكّدنا أن الملفّ بلا صوت؟ لا مجرّد أنّنا لم نتأكّد أن فيه صوتًا.
+
+    التمييز مقصود ويلزم للمسار الأساسيّ: هناك يُخلط الصوت مع صمتٍ افتراضًا،
+    فلو عاملنا «تعذّرت القراءة» معاملة «لا صوت» لضاع صوت المقطع كلّه بصمت.
+    وبالمقابل، مقطعٌ صامتٌ حقًّا يجب ألّا يدخل amix وإلّا سقط التصدير كلُّه.
+    """
+    _has_audio(path)
+    return _AUDIO_SEEN.get(path) is False
 
 
 def _is_image(path):
@@ -451,8 +463,10 @@ def build(project, output, encoder="libx264", quality=70, scale=None,
 
             # الصوت قد لا يوجد في المصدر: نخلطه مع صمت بطول المقطع فيوجد دائمًا.
             # طول الصمت بزمن المصدر لأن atempo بعده يضغطه إلى زمن الخرج.
-            if frozen:
-                # الصورة بلا صوت: صمتٌ بطولها بدل خلطٍ مع تيّارٍ غير موجود
+            if frozen or _audio_known_absent(clip.source):
+                # بلا صوت: صمتٌ بطوله بدل خلطٍ مع تيّارٍ غير موجود. الصور
+                # الساكنة أوضح مثال، ومقاطع الفيديو الصامتة - تسجيلُ شاشةٍ
+                # أو رسمٌ متحرّك مصدَّر - تسقط بالخطأ نفسه.
                 graph.append("anullsrc=r=%d:cl=stereo:d=%.6f[a%d]"
                              % (AUDIO_RATE, seconds, index))
             else:
@@ -840,6 +854,17 @@ def demo():
              "-f", "lavfi", "-i", "testsrc2=s=160x90:d=1:r=30",
              "-an", silent], check=True, creationflags=NO_WINDOW)
         assert _has_audio(noisy) and not _has_audio(silent), "القراءة خاطئة"
+        assert _audio_known_absent(silent), "لم يُعرف الصامت صامتًا"
+        assert not _audio_known_absent(noisy), "عُدّ ذو الصوت صامتًا"
+
+        # المسار الأساسيّ: فيديو صامت لا يدخل amix وإلّا سقط التصدير كلُّه
+        quiet = Editor(Project(Fraction(30, 1), 320, 180))
+        quiet.append("video", Clip(silent, 0, 30))
+        line = build(quiet.project, "out.mp4")
+        blob = line[line.index("-filter_complex") + 1]
+        assert "[0:a?]" not in blob, "خلط صوتٍ لمقطعٍ صامت على الأساس"
+        assert "anullsrc" in blob, "المقطع الصامت بلا مسار صمت"
+        print("مقطع صامت على المسار الأساس: صمتٌ بلا amix ✓")
 
         hush = Editor(Project(Fraction(30, 1), 640, 360))
         hush.append("video", Clip(noisy, 0, 60))
