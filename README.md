@@ -16,7 +16,7 @@
 
 [![معاينة](docs/preview.gif)](docs/wun_cut.mp4)
 
-**▶ [شاهد المقطع كاملًا (٢:٤٠ دقيقة)](docs/wun_cut.mp4)**
+**▶ [نزّل المقطع كاملًا (٢:٤٠ دقيقة · ٨ م.ب)](docs/wun_cut.mp4?raw=1)**
 
 </div>
 
