@@ -20,7 +20,7 @@ from PySide6.QtGui import QColor, QFont, QFontDatabase
 APP_NAME = "Wun Cut"
 APP_TAGLINE = t("محرّر فيديو")
 AUTHOR = "Athlawi"
-VERSION = "0.1"
+VERSION = "1.0"
 COPYRIGHT = "© 2026 Athlawi"
 REPO = "Ryanathlawi/wun-cut"
 

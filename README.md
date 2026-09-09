@@ -6,6 +6,8 @@
 
 **محرّر فيديو عربيّ · مجّاني · يعمل بلا إنترنت**
 
+[![نزّل البرنامج](https://img.shields.io/badge/%E2%AC%87%20%D9%86%D8%B2%D9%91%D9%84%20%D8%A7%D9%84%D8%A8%D8%B1%D9%86%D8%A7%D9%85%D8%AC-1.0-2EA043?style=for-the-badge)](https://github.com/Ryanathlawi/wun-cut/releases/latest)
+
 </div>
 
 ---
@@ -66,7 +68,8 @@
 
 ## التثبيت
 
-نزّل `Wun Cut Setup.exe` وشغّله. المثبّت:
+نزّل `Wun Cut Setup.exe` من [آخر إصدار](https://github.com/Ryanathlawi/wun-cut/releases/latest)
+وشغّله. المثبّت:
 
 1. يعرض مسار التثبيت (الافتراضيّ `%LOCALAPPDATA%\Programs\Wun Cut`) ويمكن تغييره.
 2. ينسخ البرنامج ومعه FFmpeg.
